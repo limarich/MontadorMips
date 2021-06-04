@@ -86,6 +86,13 @@ def lerCodigo(string):
             elif(str=='l'):
                 chave = 15
                 token += 'l'
+            elif(str == '$'):
+                chave = 16
+                token+='$'
+            elif(string.isdigit()):
+                chave = 0
+                tokens.append(Token(string, 'numero'))
+                break
         elif(chave == 1):
             if(str == 'd'):
                 chave = 2
@@ -200,6 +207,79 @@ def lerCodigo(string):
                 token += 'w'
                 tokens.append(Token(token, 'comando'))
                 token = ""
+        elif(chave == 16):
+            if(string == '$zero'):
+                chave = 0
+                token = ""
+                tokens.append(Token('$zero','registrador'))
+            elif(str == 'a'):
+                chave = 17
+                token+='a'
+            elif(str == 'v'):
+                chave = 18
+                token += 'v'
+            elif(str == 't'):
+                chave = 19
+                token += 't'
+            elif(str== 's'):
+                chave = 20
+                token+='s' 
+            elif(str=='k'):
+                chave = 18
+                token += 'k'
+            elif(str=='g'):
+                chave = 21
+                token+='g'
+            elif(str=='f'):
+                chave = 21
+                token+='f'
+            elif(str == 'r'):
+                chave = 22
+                token += 'r'
+        elif(chave == 17):
+            if(str == 't'):
+                chave = 0
+                token += 't'
+                tokens.append(Token(token, 'registrador'))
+                token = ''
+            elif(int(str) >= 0 and int(str) <= 3):
+                chave = 0
+                token += str
+                tokens.append(Token(token, 'registrador'))
+        elif(chave == 18): 
+            if(int(str) == 0 or int(str) == 1):
+                token+=str
+                chave = 0
+                tokens.append(Token(token, 'registrador'))
+                token = ''
+        elif(chave == 19):
+            if(int(str) >= 0 and int(str) <= 9):
+                chave = 0
+                token += str
+                tokens.append(Token(token, 'registrador'))
+                token = ''
+        elif(chave == 20):
+            if(str == 'p'):
+                chave = 0
+                token += 'p'
+                tokens.append(Token(token,'registrador'))
+                token =''
+            elif(int(str) >= 0 and int(str) <= 7):
+                chave = 0
+                token += str
+                tokens.append(Token(token, 'registrador'))
+                token =''
+        elif(chave == 21):
+            if(str == 'p'):
+                chave = 0
+                token += 'p'
+                tokens.append(Token(token,'registrador'))
+                token =''
+        elif(chave == 22):
+            if(str == 'a'):
+                chave = 0
+                token += 'a'
+                tokens.append(Token(token, 'registrador'))
         else:
             chave = 0
             erro = f"sintaxe inválida: {token}"
@@ -222,7 +302,6 @@ for tk in tokens:
     print(tk.token+'\n')
 #lidar com labels
 #lidar com comentarios
-#lidar com registradores
 #lidar com endereco de memoria caso use
 #lidar com conversao para binario
 #converter o codigo em binario

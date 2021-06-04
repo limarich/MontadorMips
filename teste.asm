@@ -1,1 +1,2 @@
-lw j sw jr jal bne xor addi $t0,$zero,15
+addi $k1,$zero,15
+
