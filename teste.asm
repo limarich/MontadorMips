@@ -1,2 +1,2 @@
-xor or jal
+xor or jal $t0
 
