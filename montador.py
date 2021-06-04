@@ -17,9 +17,16 @@ carrega o arquivo passado no console
 """
 def loadFile(fileName):
     global linhas
+    aux = [] #lista auxiliar recebe todos os itens da linha
     arquivo  = open(fileName, "r")
-    for linha in arquivo:
-        linhas.append(linha.split())
+    for linha in arquivo: #para cada linha do arquivo
+        temp = linha.split(",") #separa as virgulas
+        for l in temp:
+            aux.append(l.split()) #separa os espaços e coloca na lista auxiliar
+    for item in aux:
+        for i in item:
+            linhas.append(i) #junta todos os itens numa lista só
+    # print(linhas)
     arquivo.close()
 
 # nomeArquivo  = sys.argv[1] #para ler pelo console
@@ -58,10 +65,39 @@ def lerCodigo(string):
             elif(str == 's'):#sub/slt/sw
                 chave = 4
                 token += 's'
+            elif(str == 'o'):
+                chave = 8
+                token += 'o'
+            elif(str=='x'):
+                chave = 9
+                token += 'x'
+            elif(str=='b'):
+                chave = 10
+                token += 'b'
+            elif(str=='j'):
+                if((string) == (str)):
+                    chave = 0
+                    token += 'j'
+                    tokens.append(Token(token,'comando'))
+                    token = 0
+                else:    
+                    chave = 13
+                    token += 'j'
+            elif(str=='l'):
+                chave = 15
+                token += 'l'
         elif(chave == 1):
             if(str == 'd'):
                 chave = 2
                 token += 'd'
+            elif(str == 'n'):
+                chave = 7
+                token += 'n'
+            else:
+                chave = 0
+                erro = f"{string}"
+                token = ""
+                raise InvalidSyntax()
         elif(chave == 2):
             if(string[-1] == 'd'):
                 chave = 0
@@ -108,13 +144,86 @@ def lerCodigo(string):
                 token += 't'
                 tokens.append(Token(token, 'comando'))
                 token = ''
+        elif(chave == 7):
+            if(str == 'd'):
+                chave = 0
+                token += 'd'
+                tokens.append(Token(token, 'comando'))
+                token = ''
+        elif(chave == 8):
+            if(str == 'r'):
+                chave = 0
+                token += 'r'
+                tokens.append(Token(token,'comando'))
+                token = ''
+        elif(chave == 9):
+            if(str == 'o'):
+                chave = 8
+                token += 'o'
+        elif(chave == 10):
+            if(str == 'e'):
+                chave = 11
+                token += 'e'
+            elif(str == 'n'):
+                chave = 12
+                token += 'n'
+        elif(chave == 11):
+            if(str == 'q'):
+                chave = 0
+                token += 'q'
+                tokens.append(Token(token,'comando'))
+                token = ''
+        elif(chave == 12): 
+            if(str == 'e'):
+                chave = 0
+                token += "e"
+                tokens.append(Token(token, 'comando'))
+                token = ''
+        elif(chave == 13):
+            if(str == 'a'):
+                chave = 14
+                token += 'a'
+            elif(str == 'r'):
+                chave = 0
+                token += 'r'
+                tokens.append(Token(token, 'comando'))
+                token = 0
+        elif(chave == 14):
+            if(str == 'l'):
+                chave = 0
+                token += 'l'
+                tokens.append(Token(token, 'comando'))
+                token = 0
+        elif(chave == 15):
+            if(str == 'w'):
+                chave = 0
+                token += 'w'
+                tokens.append(Token(token, 'comando'))
+                token = ""
         else:
             chave = 0
             erro = f"sintaxe inválida: {token}"
+            print(erro)
             token = ''
-# Futuramente será uma função que faz a leitura de cada linha e passa para a lerCodigo
-try:
-    lerCodigo(linhas[0][0])
-    print(tokens[0].token)
-except:
-    print(erro)
+"""
+ uma função que faz a leitura de cada linha e passa para a lerCodigo
+ """
+def lerLinhas():
+    for l in linhas:
+        # for m in l: 
+        try:
+            lerCodigo(l)
+            # print((l))
+        except:
+            print(f"sintaxe invalida -->{erro}\n")
+            quit()
+lerLinhas()
+for tk in tokens:
+    print(tk.token+'\n')
+#lidar com labels
+#lidar com comentarios
+#lidar com registradores
+#lidar com endereco de memoria caso use
+#lidar com conversao para binario
+#converter o codigo em binario
+#lidar com erros de sintaxe
