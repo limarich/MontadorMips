@@ -1,14 +1,5 @@
 import sys
-registradores = [
-    '$zero', '$at', '$v0', '$v1', '$a0', '$a2', '$a3', '$t0',
-    '$t1', '$t2', '$t3', '$t4', '$t5', '$t6', '$t7','$s0',
-    '$s1', '$s2', '$s3', '$s4', '$s5', '$s6', '$s7', '$t8', '$t9',
-    '$k0', '$k1', '$gp', '$sp', '$fp', '$ra'
-]
-comandos = [
-    'add', 'addi', 'sub', 'and', 'or', 'xor', 'slt', 'beq', 'bne',
-    'j', 'jal', 'jr', 'lw', 'sw'
-]
+nda = '--'
 linhas = [] #recebe as linhas do código
 tokens = [] #tokens dos codigos
 erro = ""
@@ -46,9 +37,11 @@ class InvalidSyntax(Exception):
 Classe de tokens
     """
 class Token():
-    def __init__(self, token, t):
+    def __init__(self, token, tipo, opcode, funct):
         self.token = token
-        self.t = t
+        self.tipo = tipo
+        self.opcode = opcode
+        self.funct = funct
 def lerCodigo(string):
     """
         realiza a leitura do arquivo carregado e verifica a escrita mediante a uma chave de controle
@@ -58,11 +51,11 @@ def lerCodigo(string):
     token = ''
     chave = 0 
     for str in string: 
-        if(chave == 0): #add/addi
+        if(chave == 0): 
             if(str == 'a'):
                 chave = 1
                 token +='a'
-            elif(str == 's'):#sub/slt/sw
+            elif(str == 's'):
                 chave = 4
                 token += 's'
             elif(str == 'o'):
@@ -78,7 +71,7 @@ def lerCodigo(string):
                 if((string) == (str)):
                     chave = 0
                     token += 'j'
-                    tokens.append(Token(token,'comando'))
+                    tokens.append(Token(token,'J',2,0)) #j
                     token = 0
                 else:    
                     chave = 13
@@ -91,7 +84,7 @@ def lerCodigo(string):
                 token+='$'
             elif(string.isdigit()):
                 chave = 0
-                tokens.append(Token(string, 'numero'))
+                tokens.append(Token(string, nda,nda,nda))#numeros
                 break
         elif(chave == 1):
             if(str == 'd'):
@@ -109,7 +102,7 @@ def lerCodigo(string):
             if(string[-1] == 'd'):
                 chave = 0
                 token += 'd'
-                tokens.append(Token(token,'comando'))
+                tokens.append(Token(token,'R',0,32))#add
                 token = ''
             elif(str == 'd'):
                 chave = 3
@@ -118,7 +111,7 @@ def lerCodigo(string):
             if(str == 'i'):
                 chave = 0
                 token += 'i'
-                tokens.append(Token(token,'comando'))
+                tokens.append(Token(token,'I',8,nda))#addi
                 token = 0
             else:
                 chave = 0
@@ -135,7 +128,7 @@ def lerCodigo(string):
             elif(str == 'w'):
                 chave = 0
                 token += 'w'
-                tokens.append(Token(token,'comando'))
+                tokens.append(Token(token,'I',43,nda)) #sw
                 token = 0
             else:
                 print('erro')
@@ -143,25 +136,29 @@ def lerCodigo(string):
             if(str == 'b'):
                 chave = 0
                 token += 'b'
-                tokens.append(Token(token,'comando'))
+                tokens.append(Token(token,'R',0,34)) #sub
                 token = ''
         elif(chave == 6):
             if(str == 't'):
                 chave = 0
                 token += 't'
-                tokens.append(Token(token, 'comando'))
+                tokens.append(Token(token, 'R',0,42))#slt
                 token = ''
         elif(chave == 7):
             if(str == 'd'):
                 chave = 0
                 token += 'd'
-                tokens.append(Token(token, 'comando'))
+                tokens.append(Token(token, 'R',0,36))#and
                 token = ''
         elif(chave == 8):
             if(str == 'r'):
                 chave = 0
                 token += 'r'
-                tokens.append(Token(token,'comando'))
+                #or/xor
+                if(string == 'or'):
+                    tokens.append(Token(token,'R',0,21))
+                else:
+                    tokens.append(Token(token,'R',0,38))
                 token = ''
         elif(chave == 9):
             if(str == 'o'):
@@ -178,13 +175,13 @@ def lerCodigo(string):
             if(str == 'q'):
                 chave = 0
                 token += 'q'
-                tokens.append(Token(token,'comando'))
+                tokens.append(Token(token,'I', 4, nda))#beq
                 token = ''
         elif(chave == 12): 
             if(str == 'e'):
                 chave = 0
                 token += "e"
-                tokens.append(Token(token, 'comando'))
+                tokens.append(Token(token, 'I', 5, nda))#bne
                 token = ''
         elif(chave == 13):
             if(str == 'a'):
@@ -193,19 +190,19 @@ def lerCodigo(string):
             elif(str == 'r'):
                 chave = 0
                 token += 'r'
-                tokens.append(Token(token, 'comando'))
+                tokens.append(Token(token, 'R', 0, 8)) #jr
                 token = 0
         elif(chave == 14):
             if(str == 'l'):
                 chave = 0
                 token += 'l'
-                tokens.append(Token(token, 'comando'))
+                tokens.append(Token(token, 'J', 3,nda))#jal
                 token = 0
         elif(chave == 15):
             if(str == 'w'):
                 chave = 0
                 token += 'w'
-                tokens.append(Token(token, 'comando'))
+                tokens.append(Token(token, 'I', 35, nda))#lw
                 token = ""
         elif(chave == 16):
             if(string == '$zero'):
@@ -299,7 +296,7 @@ def lerLinhas():
             quit()
 lerLinhas()
 for tk in tokens:
-    print(tk.token+'\n')
+    print(tk.opcode,'\n')
 #lidar com labels
 #lidar com comentarios
 #lidar com endereco de memoria caso use

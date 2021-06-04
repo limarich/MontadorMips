@@ -1,2 +1,2 @@
-addi $k1,$zero,15
+xor or jal
 
