@@ -3,6 +3,7 @@ nda = 0
 linhas = [] #recebe as linhas do código
 tokens = [] #tokens dos codigos
 offset = []
+code = []
 shamt = "00000"
 erro = ""
 """
@@ -366,28 +367,29 @@ def setOffset():
         if(tk.tipo != "registrador" and tk.tipo != 0):
                 offset.append(eqPrecisao(format(Pc, "b")))
                 Pc+=4
-lerLinhas()
-#lê cada token
-setOffset()
-print(offset)
-code = []
-codigo=""
-while len(tokens) > 0:
-    if(tokens[0].tipo == 'R'):
-        codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + tokens[3].funct + shamt + tokens[0].funct #op+rs+rt+rd+shamt+func
-        for i in range(0, 4):#retira os 4 primeiros
-            tokens.pop(0)
-        code.append(codigo)
-        codigo = ''
-    # elif(tk.tipo == 'J'):
-    elif(tokens[0].tipo == 'I'):
-        if(tokens[0].token == 'addi'):
-            codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + eqPrecisao(tokens[3].funct)#op+rs+rt+imm
+def tradutor():
+    codigo=""
+    global tokens
+    while len(tokens) > 0:
+        if(tokens[0].tipo == 'R'):
+            codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + tokens[3].funct + shamt + tokens[0].funct #op+rs+rt+rd+shamt+func
             for i in range(0, 4):#retira os 4 primeiros
                 tokens.pop(0)
             code.append(codigo)
             codigo = ''
-
+        # elif(tk.tipo == 'J'):
+        elif(tokens[0].tipo == 'I'):
+            if(tokens[0].token == 'addi'):
+                codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + eqPrecisao(tokens[3].funct)#op+rs+rt+imm
+                for i in range(0, 4):#retira os 4 primeiros
+                    tokens.pop(0)
+                code.append(codigo)
+                codigo = ''
+lerLinhas()
+#lê cada token
+setOffset()
+tradutor()
+print(code)
 #lidar com labels
 #pode parenteses em caso de pilha https://d2vlcm61l7u1fs.cloudfront.net/media%2F138%2F1380baa4-79a2-4bcf-9e82-9e5e57830f26%2FphpePJ8xi.png
 #lidar com erros de sintaxe
