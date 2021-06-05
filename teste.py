@@ -1,11 +1,13 @@
-teste = []
-lista = []
-teste.append("aqui é codigo #aqui é comentario")
-teste.append("aqui é outro codigo #aqui nao")
-def retiraComentario(string):#str
-    l = string.split("#")#faço split e jogo pra lista
-    l.pop()#retirei o que não desejo
-    return l#retorno uma lista
-for t in teste:
-    lista.append(retiraComentario(t))
-print(lista)
+def retiraComentario(string):
+    str = ""
+    for ch in string:
+        if(ch != "#"):
+            str += ch
+        if(ch == "#"):
+            break
+    return str
+            
+arquivo = open("teste.asm", "r")
+for linha in arquivo:
+    print(retiraComentario(linha))
+arquivo.close()
