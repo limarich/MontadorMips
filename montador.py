@@ -1,7 +1,8 @@
 import sys
-nda = '--'
+nda = 0
 linhas = [] #recebe as linhas do código
 tokens = [] #tokens dos codigos
+shamt = "00000"
 erro = ""
 """
 carrega o arquivo passado no console
@@ -71,7 +72,7 @@ def lerCodigo(string):
                 if((string) == (str)):
                     chave = 0
                     token += 'j'
-                    tokens.append(Token(token,'J',2,0)) #j
+                    tokens.append(Token(token,'J',"000010",0)) #j
                     token = 0
                 else:    
                     chave = 13
@@ -84,7 +85,7 @@ def lerCodigo(string):
                 token+='$'
             elif(string.isdigit()):
                 chave = 0
-                tokens.append(Token(string, nda,nda,nda))#numeros
+                tokens.append(Token(string, nda,nda,format(int(string),"b")))#numeros
                 break
         elif(chave == 1):
             if(str == 'd'):
@@ -102,7 +103,7 @@ def lerCodigo(string):
             if(string[-1] == 'd'):
                 chave = 0
                 token += 'd'
-                tokens.append(Token(token,'R',0,32))#add
+                tokens.append(Token(token,'R',"000000","100000"))#add
                 token = ''
             elif(str == 'd'):
                 chave = 3
@@ -111,7 +112,7 @@ def lerCodigo(string):
             if(str == 'i'):
                 chave = 0
                 token += 'i'
-                tokens.append(Token(token,'I',8,nda))#addi
+                tokens.append(Token(token,'I',"001000",nda))#addi
                 token = 0
             else:
                 chave = 0
@@ -128,7 +129,7 @@ def lerCodigo(string):
             elif(str == 'w'):
                 chave = 0
                 token += 'w'
-                tokens.append(Token(token,'I',43,nda)) #sw
+                tokens.append(Token(token,'I',"101011",nda)) #sw
                 token = 0
             else:
                 print('erro')
@@ -136,19 +137,19 @@ def lerCodigo(string):
             if(str == 'b'):
                 chave = 0
                 token += 'b'
-                tokens.append(Token(token,'R',0,34)) #sub
+                tokens.append(Token(token,'R',"000000","100010")) #sub
                 token = ''
         elif(chave == 6):
             if(str == 't'):
                 chave = 0
                 token += 't'
-                tokens.append(Token(token, 'R',0,42))#slt
+                tokens.append(Token(token, 'R',"000000","101010"))#slt
                 token = ''
         elif(chave == 7):
             if(str == 'd'):
                 chave = 0
                 token += 'd'
-                tokens.append(Token(token, 'R',0,36))#and
+                tokens.append(Token(token, 'R',"000000","100100"))#and
                 token = ''
         elif(chave == 8):
             if(str == 'r'):
@@ -156,9 +157,9 @@ def lerCodigo(string):
                 token += 'r'
                 #or/xor
                 if(string == 'or'):
-                    tokens.append(Token(token,'R',0,21))
+                    tokens.append(Token(token,'R',"000000","100101"))
                 else:
-                    tokens.append(Token(token,'R',0,38))
+                    tokens.append(Token(token,'R',"000000","100110"))
                 token = ''
         elif(chave == 9):
             if(str == 'o'):
@@ -175,13 +176,13 @@ def lerCodigo(string):
             if(str == 'q'):
                 chave = 0
                 token += 'q'
-                tokens.append(Token(token,'I', 4, nda))#beq
+                tokens.append(Token(token,'I', "000100", nda))#beq
                 token = ''
         elif(chave == 12): 
             if(str == 'e'):
                 chave = 0
                 token += "e"
-                tokens.append(Token(token, 'I', 5, nda))#bne
+                tokens.append(Token(token, 'I', "000101", nda))#bne
                 token = ''
         elif(chave == 13):
             if(str == 'a'):
@@ -190,25 +191,25 @@ def lerCodigo(string):
             elif(str == 'r'):
                 chave = 0
                 token += 'r'
-                tokens.append(Token(token, 'R', 0, 8)) #jr
+                tokens.append(Token(token, 'R', "000000", "001000")) #jr
                 token = 0
         elif(chave == 14):
             if(str == 'l'):
                 chave = 0
                 token += 'l'
-                tokens.append(Token(token, 'J', 3,nda))#jal
+                tokens.append(Token(token, 'J', "000011",nda))#jal
                 token = 0
         elif(chave == 15):
             if(str == 'w'):
                 chave = 0
                 token += 'w'
-                tokens.append(Token(token, 'I', 35, nda))#lw
+                tokens.append(Token(token, 'I', "100011", nda))#lw
                 token = ""
         elif(chave == 16):
             if(string == '$zero'):
                 chave = 0
                 token = ""
-                tokens.append(Token('$zero','registrador',nda,nda))
+                tokens.append(Token('$zero','registrador',nda,'00000')) #zero
             elif(str == 'a'):
                 chave = 17
                 token+='a'
@@ -237,46 +238,93 @@ def lerCodigo(string):
             if(str == 't'):
                 chave = 0
                 token += 't'
-                tokens.append(Token(token, 'registrador',nda,nda))
+                tokens.append(Token(token, 'registrador',nda,"00001"))#at
                 token = ''
             elif(int(str) >= 0 and int(str) <= 3):
                 chave = 0
                 token += str
-                tokens.append(Token(token, 'registrador',nda,nda))
+                if(int(str) == 0):
+                    tokens.append(Token(token, 'registrador',nda,"00100"))#a0
+                elif(int(str) == 1):
+                    tokens.append(Token(token, 'registrador',nda,"00101"))#a1
+                elif(int(str) == 2):
+                    tokens.append(Token(token, 'registrador',nda,"00110"))#a2
+                elif(int(str) == 3):
+                    tokens.append(Token(token, 'registrador',nda,"00111"))#a3
         elif(chave == 18): 
             if(int(str) == 0 or int(str) == 1):
                 token+=str
                 chave = 0
-                tokens.append(Token(token, 'registrador',nda,nda))
+                if(int(str) == 0):
+                    tokens.append(Token(token, 'registrador',nda,"11010"))#k0
+                elif(int(str) == 1):
+                    tokens.append(Token(token, 'registrador',nda,"11011"))#k1
                 token = ''
         elif(chave == 19):
             if(int(str) >= 0 and int(str) <= 9):
                 chave = 0
                 token += str
-                tokens.append(Token(token, 'registrador',nda,nda))
+                if(int(str) == 0):
+                    tokens.append(Token(token, 'registrador',nda,"01000"))#t0
+                if(int(str) == 1):
+                    tokens.append(Token(token, 'registrador',nda,"01001"))#t1
+                if(int(str) == 2):
+                    tokens.append(Token(token, 'registrador',nda,"01010"))#t2
+                if(int(str) == 3):
+                    tokens.append(Token(token, 'registrador',nda,"01011"))#t3
+                if(int(str) == 4):
+                    tokens.append(Token(token, 'registrador',nda,"01100"))#t4
+                if(int(str) == 5):
+                    tokens.append(Token(token, 'registrador',nda,"01101"))#t5
+                if(int(str) == 6):
+                    tokens.append(Token(token, 'registrador',nda,"01110"))#t6
+                if(int(str) == 7):
+                    tokens.append(Token(token, 'registrador',nda,"01101"))#t7
+                if(int(str) == 8):
+                    tokens.append(Token(token, 'registrador',nda,"11000"))#t8
+                if(int(str) == 9):
+                    tokens.append(Token(token, 'registrador',nda,"11001"))#t9
                 token = ''
         elif(chave == 20):
             if(str == 'p'):
                 chave = 0
                 token += 'p'
-                tokens.append(Token(token,'registrador',nda,nda))
+                tokens.append(Token(token,'registrador',nda,"11101"))#sp
                 token =''
             elif(int(str) >= 0 and int(str) <= 7):
                 chave = 0
                 token += str
-                tokens.append(Token(token, 'registrador',nda,nda))
+                if(int(str) == 0):
+                    tokens.append(Token(token, 'registrador',nda,'10000'))#s0
+                elif(int(str) == 1):
+                    tokens.append(Token(token, 'registrador',nda,'10001'))#s1
+                elif(int(str) == 2):
+                    tokens.append(Token(token, 'registrador',nda,'10010'))#s2
+                elif(int(str) == 3):
+                    tokens.append(Token(token, 'registrador',nda,'10011'))#s3
+                elif(int(str) == 4):
+                    tokens.append(Token(token, 'registrador',nda,'10100'))#s4
+                elif(int(str) == 5):
+                    tokens.append(Token(token, 'registrador',nda,'10101'))#s5
+                elif(int(str) == 6):
+                    tokens.append(Token(token, 'registrador',nda,'10110'))#s6
+                elif(int(str) == 7):
+                    tokens.append(Token(token, 'registrador',nda,'10011'))#s7
                 token =''
         elif(chave == 21):
             if(str == 'p'):
                 chave = 0
                 token += 'p'
-                tokens.append(Token(token,'registrador',nda,nda))
+                if(string == '$fp'):
+                    tokens.append(Token(token,'registrador',nda,"11110"))#fp
+                if(string == '$gp'):
+                    tokens.append(Token(token,'registrador',nda,"11100"))#gp
                 token =''
         elif(chave == 22):
             if(str == 'a'):
                 chave = 0
                 token += 'a'
-                tokens.append(Token(token, 'registrador',nda,nda))
+                tokens.append(Token(token, 'registrador',nda,"11111"))#ra
         else:
             chave = 0
             erro = f"sintaxe inválida: {token}"
@@ -294,12 +342,32 @@ def lerLinhas():
         except:
             print(f"sintaxe invalida -->{erro}\n")
             quit()
+def eqPrecisao(binario): #ajeita a precisao deixa a mesma para todos os inteiros fornecidos
+    while(len(binario) != 16):
+        binario = "0" + binario 
+    return binario
 lerLinhas()
-for tk in tokens:
-    print(tk.opcode,'\n')
+#lê cada token
+code = []
+codigo=""
+while len(tokens) > 0:
+    if(tokens[0].tipo == 'R'):
+        codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + tokens[3].funct + shamt + tokens[0].funct #op+rs+rt+rd+shamt+func
+        for i in range(0, 4):#retira os 4 primeiros
+            tokens.pop(0)
+        code.append(codigo)
+        codigo = ''
+    # elif(tk.tipo == 'J'):
+    elif(tokens[0].tipo == 'I'):
+        if(tokens[0].token == 'addi'):
+            codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + eqPrecisao(tokens[3].funct)#op+rs+rt+imm
+            for i in range(0, 4):#retira os 4 primeiros
+                tokens.pop(0)
+            code.append(codigo)
+            codigo = ''
+print(code)
 #lidar com labels
 #lidar com comentarios
-#lidar com endereco de memoria caso use
-#lidar com conversao para binario
-#converter o codigo em binario
+#pode parenteses em caso de pilha https://d2vlcm61l7u1fs.cloudfront.net/media%2F138%2F1380baa4-79a2-4bcf-9e82-9e5e57830f26%2FphpePJ8xi.png
 #lidar com erros de sintaxe
+#acompanhar o endereço de cada linha(começar em 0) 
