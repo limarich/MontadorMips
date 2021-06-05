@@ -7,6 +7,7 @@ erro = ""
 """
 carrega o arquivo passado no console
 """
+
 def loadFile(fileName):
     global linhas
     aux = [] #lista auxiliar recebe todos os itens da linha
@@ -49,6 +50,7 @@ def lerCodigo(string):
     """
     global tokens
     global erro
+    global comentario
     token = ''
     chave = 0 
     for str in string: 
@@ -334,10 +336,10 @@ def lerCodigo(string):
  uma função que faz a leitura de cada linha e passa para a lerCodigo
  """
 def lerLinhas():
-    for l in linhas:
-        # for m in l: 
+    global comentario
+    for l in range(len(linhas)): 
         try:
-            lerCodigo(l)
+            lerCodigo(linhas[l])
             # print((l))
         except:
             print(f"sintaxe invalida -->{erro}\n")
