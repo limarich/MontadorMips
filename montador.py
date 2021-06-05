@@ -2,17 +2,28 @@ import sys
 nda = 0
 linhas = [] #recebe as linhas do código
 tokens = [] #tokens dos codigos
+offset = []
 shamt = "00000"
 erro = ""
 """
 carrega o arquivo passado no console
 """
-
+def retiraComentario(string):
+    str = ""
+    for ch in string:
+        if(ch != "#"):
+            str += ch
+        if(ch == "#"):
+            break
+    return str
 def loadFile(fileName):
     global linhas
+    temp1 = []
     aux = [] #lista auxiliar recebe todos os itens da linha
     arquivo  = open(fileName, "r")
-    for linha in arquivo: #para cada linha do arquivo
+    for linha in arquivo: #retira comentario de cada linha
+        temp1.append(retiraComentario(linha))
+    for linha in temp1:    
         temp = linha.split(",") #separa as virgulas
         for l in temp:
             aux.append(l.split()) #separa os espaços e coloca na lista auxiliar
@@ -348,8 +359,17 @@ def eqPrecisao(binario): #ajeita a precisao deixa a mesma para todos os inteiros
     while(len(binario) != 16):
         binario = "0" + binario 
     return binario
+def setOffset():
+    global offset
+    Pc = 0
+    for tk in tokens:
+        if(tk.tipo != "registrador" and tk.tipo != 0):
+                offset.append(eqPrecisao(format(Pc, "b")))
+                Pc+=4
 lerLinhas()
 #lê cada token
+setOffset()
+print(offset)
 code = []
 codigo=""
 while len(tokens) > 0:
@@ -367,9 +387,8 @@ while len(tokens) > 0:
                 tokens.pop(0)
             code.append(codigo)
             codigo = ''
-print(code)
+
 #lidar com labels
-#lidar com comentarios
 #pode parenteses em caso de pilha https://d2vlcm61l7u1fs.cloudfront.net/media%2F138%2F1380baa4-79a2-4bcf-9e82-9e5e57830f26%2FphpePJ8xi.png
 #lidar com erros de sintaxe
-#acompanhar o endereço de cada linha(começar em 0) 
+
