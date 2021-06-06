@@ -10,6 +10,19 @@ erro = ""
 """
 carrega o arquivo passado no console
 """
+entrada  = sys.argv[1] #para ler pelo console
+saida = ""
+if len(sys.argv) <= 2:
+    saida = "memoria.dat"
+else:
+    saida = sys.argv[2]
+def isValid():#verifica se o nome do arquivo esta dentro do esperado
+    if entrada.find('.asm') == -1:
+        print("formato de entrada não suportado!!!")
+        quit()
+    if saida.find('.dat') == -1:
+        print("formato de saida não suportado!!!")
+        quit()
 def retiraParenteses(lista):
     temp = []
     temp2 = []
@@ -29,6 +42,7 @@ def retiraComentario(string):
             break
     return str
 def loadFile(fileName):
+    isValid()
     global linhas
     temp1 = []
     linha2 = []
@@ -45,12 +59,11 @@ def loadFile(fileName):
     for item in aux:
         for i in item:
             linhas.append(i) #junta todos os itens numa lista só
-    arquivo.close()
+    arquivo.close() 
 
-# nomeArquivo  = sys.argv[1] #para ler pelo console
-
-loadFile("teste.asm") #nomeArquivo
+loadFile(entrada) #nomeArquivo
 print(linhas)
+# print(f"nome2: {saida}")
 """
 #para rodar use: python montador.py nomeDoArquivo.asm
 """
