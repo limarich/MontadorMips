@@ -1,8 +1,9 @@
 import sys
-nda = 0
+nda = 0 
 linhas = [] #recebe as linhas do código
 tokens = [] #tokens dos codigos
 offset = []
+labels = {}
 code = []
 shamt = "00000"
 erro = ""
@@ -56,16 +57,19 @@ class Token():
         self.tipo = tipo
         self.opcode = opcode
         self.funct = funct
+
 def lerCodigo(string):
     """
         realiza a leitura do arquivo carregado e verifica a escrita mediante a uma chave de controle
     """
     global tokens
     global erro
-    global comentario
     token = ''
     chave = 0 
     for str in string: 
+        if(labels.get(string) != None):
+            tokens.append(Token(labels.get(string),"offset",nda,nda))
+            break
         if(chave == 0): 
             if(str == 'a'):
                 chave = 1
@@ -87,7 +91,7 @@ def lerCodigo(string):
                     chave = 0
                     token += 'j'
                     tokens.append(Token(token,'J',"000010",0)) #j
-                    token = 0
+                    token = ""
                 else:    
                     chave = 13
                     token += 'j'
@@ -348,11 +352,10 @@ def lerCodigo(string):
  uma função que faz a leitura de cada linha e passa para a lerCodigo
  """
 def lerLinhas():
-    global comentario
     for l in range(len(linhas)): 
         try:
             lerCodigo(linhas[l])
-            # print((l))
+            # print((linhas[l]))
         except:
             print(f"sintaxe invalida -->{erro}\n")
             quit()
@@ -385,12 +388,29 @@ def tradutor():
                     tokens.pop(0)
                 code.append(codigo)
                 codigo = ''
+            if(tokens[0].token == 'beq' or tokens[0].token == 'bne'):
+                codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + tokens[3].token #op+rs+rt+offset
+                for i in range(0, 4):#retira os 4 primeiros
+                    tokens.pop(0)
+                code.append(codigo)
+def setLabels():
+    global labels
+    l = 0
+    while l < len(linhas):
+        if(linhas[l][-1] == ':'):
+            labels[linhas[l][:-1]] = eqPrecisao(format(l,"b")) 
+            linhas.pop(l)
+        l += 1
+#ler os labels
+setLabels()
 lerLinhas()
+# for tk in tokens:
+#     print(tk.token)
 #lê cada token
 setOffset()
+
 tradutor()
-print(code)
+print((code[2]))
 #lidar com labels
 #pode parenteses em caso de pilha https://d2vlcm61l7u1fs.cloudfront.net/media%2F138%2F1380baa4-79a2-4bcf-9e82-9e5e57830f26%2FphpePJ8xi.png
 #lidar com erros de sintaxe
-
