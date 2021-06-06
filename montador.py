@@ -393,7 +393,7 @@ def tradutor():
                     for i in range(0, 2):#retira os 4 primeiros
                         tokens.pop(0)
                     code.append(codigo)
-                if(tokens[0].token == "jal"):
+                elif(tokens[0].token == "jal"):
                    codigo += tokens[0].opcode + eqPrecisao(format(int(tokens[1].token,2)+4,"b"),26) #op+target
                    for i in range(0, 2):#retira os 4 primeiros
                         tokens.pop(0)
@@ -405,7 +405,7 @@ def tradutor():
                     tokens.pop(0)
                 code.append(codigo)
                 codigo = ''
-            if(tokens[0].token == 'beq' or tokens[0].token == 'bne'):
+            elif(tokens[0].token == 'beq' or tokens[0].token == 'bne'):
                 codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + tokens[3].token #op+rs+rt+offset
                 for i in range(0, 4):#retira os 4 primeiros
                     tokens.pop(0)
