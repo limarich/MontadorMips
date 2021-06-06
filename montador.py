@@ -10,6 +10,16 @@ erro = ""
 """
 carrega o arquivo passado no console
 """
+def retiraParenteses(lista):
+    temp = []
+    temp2 = []
+    for l in lista:
+        temp.append(l.split("("))
+    for t2 in temp:
+        # temp2.append(t2.split())
+        for t3 in t2:
+            temp2.append(t3.split(")"))
+    return temp2
 def retiraComentario(string):
     str = ""
     for ch in string:
@@ -21,24 +31,26 @@ def retiraComentario(string):
 def loadFile(fileName):
     global linhas
     temp1 = []
+    linha2 = []
     aux = [] #lista auxiliar recebe todos os itens da linha
     arquivo  = open(fileName, "r")
     for linha in arquivo: #retira comentario de cada linha
         temp1.append(retiraComentario(linha))
-    for linha in temp1:    
-        temp = linha.split(",") #separa as virgulas
-        for l in temp:
-            aux.append(l.split()) #separa os espaços e coloca na lista auxiliar
+    linha2 = retiraParenteses(temp1)
+    for linha3 in linha2:
+        for linha in linha3:    
+            temp = linha.split(",") #separa as virgulas
+            for l in temp:
+                aux.append(l.split()) #separa os espaços e coloca na lista auxiliar
     for item in aux:
         for i in item:
             linhas.append(i) #junta todos os itens numa lista só
-    # print(linhas)
     arquivo.close()
 
 # nomeArquivo  = sys.argv[1] #para ler pelo console
 
 loadFile("teste.asm") #nomeArquivo
-# print(linhas)
+print(linhas)
 """
 #para rodar use: python montador.py nomeDoArquivo.asm
 """
@@ -101,6 +113,11 @@ def lerCodigo(string):
             elif(str == '$'):
                 chave = 16
                 token+='$'
+            # elif(str.isdigit() and string.find('(') >= 0 and string.find(')') >= 0):
+            #     temp1 = string.split('(') #offset[0]
+            #     temp2 = temp1[1].split(')')#registrador[0]
+            #     tokens.append(Token(temp1[0],nda,nda,format(int(string),"b")))
+            #     tokens.append(Token(temp2[0],nda,nda,))
             elif(string.isdigit()):
                 chave = 0
                 tokens.append(Token(string, nda,nda,format(int(string),"b")))#numeros
@@ -387,17 +404,19 @@ def tradutor():
             code.append(codigo)
             codigo = ''
         elif(tokens[0].tipo == 'J'):
-            if(tokens[0].tipo == 'J'):
-                if(tokens[0].token == "j"):
-                    codigo += tokens[0].opcode + eqPrecisao(tokens[1].token,26) #op+target
-                    for i in range(0, 2):#retira os 4 primeiros
-                        tokens.pop(0)
-                    code.append(codigo)
-                elif(tokens[0].token == "jal"):
+            # if(tokens[0].tipo == 'J'):
+            if(tokens[0].token == "j"):
+                codigo += tokens[0].opcode + eqPrecisao(tokens[1].token,26) #op+target
+                for i in range(0, 2):#retira os 4 primeiros
+                    tokens.pop(0)
+                code.append(codigo)
+                codigo = ""
+            elif(tokens[0].token == "jal"):
                    codigo += tokens[0].opcode + eqPrecisao(format(int(tokens[1].token,2)+4,"b"),26) #op+target
                    for i in range(0, 2):#retira os 4 primeiros
                         tokens.pop(0)
                    code.append(codigo)
+                   codigo = ""
         elif(tokens[0].tipo == 'I'):
             if(tokens[0].token == 'addi'):
                 codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + eqPrecisao(tokens[3].funct,16)#op+rs+rt+imm
@@ -410,6 +429,14 @@ def tradutor():
                 for i in range(0, 4):#retira os 4 primeiros
                     tokens.pop(0)
                 code.append(codigo)
+                codigo = ""
+            elif(tokens[0].token == 'lw' or tokens[0].token == 'sw'):
+                codigo += tokens[0].opcode + tokens[3].funct + tokens[1].funct + eqPrecisao(tokens[2].funct,16) #op+rs+offset+rt
+                for i in range(0, 4):#retira os 4 primeiros
+                    tokens.pop(0)
+                code.append(codigo)
+                codigo =""
+
 def setLabels():
     global labels
     l = 0
@@ -428,7 +455,5 @@ setOffset()
 
 tradutor()
 print((code))
-#lidar com labels
-#pode parenteses em caso de pilha https://d2vlcm61l7u1fs.cloudfront.net/media%2F138%2F1380baa4-79a2-4bcf-9e82-9e5e57830f26%2FphpePJ8xi.png
 #lidar com erros de sintaxe
 #lidar com endereço puro 
