@@ -359,8 +359,8 @@ def lerLinhas():
         except:
             print(f"sintaxe invalida -->{erro}\n")
             quit()
-def eqPrecisao(binario): #ajeita a precisao deixa a mesma para todos os inteiros fornecidos
-    while(len(binario) != 16):
+def eqPrecisao(binario,qtd): #ajeita a precisao deixa a mesma para todos os inteiros fornecidos
+    while(len(binario) != qtd):
         binario = "0" + binario 
     return binario
 def setOffset():
@@ -368,22 +368,39 @@ def setOffset():
     Pc = 0
     for tk in tokens:
         if(tk.tipo != "registrador" and tk.tipo != 0):
-                offset.append(eqPrecisao(format(Pc, "b")))
+                offset.append(eqPrecisao(format(Pc, "b"),16))
                 Pc+=4
 def tradutor():
     codigo=""
     global tokens
     while len(tokens) > 0:
-        if(tokens[0].tipo == 'R'):
+        if(tokens[0].tipo == 'R' and tokens[0].token == "jr"):
+            codigo += tokens[0].opcode + tokens[1].funct + eqPrecisao(shamt,15) + tokens[0].funct #op+rs+shamt+func
+            for i in range(0, 2):#retira os 4 primeiros
+                tokens.pop(0)
+            code.append(codigo)
+            codigo = ''
+        elif(tokens[0].tipo == 'R'):
             codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + tokens[3].funct + shamt + tokens[0].funct #op+rs+rt+rd+shamt+func
             for i in range(0, 4):#retira os 4 primeiros
                 tokens.pop(0)
             code.append(codigo)
             codigo = ''
-        # elif(tk.tipo == 'J'):
+        elif(tokens[0].tipo == 'J'):
+            if(tokens[0].tipo == 'J'):
+                if(tokens[0].token == "j"):
+                    codigo += tokens[0].opcode + eqPrecisao(tokens[1].token,26) #op+target
+                    for i in range(0, 2):#retira os 4 primeiros
+                        tokens.pop(0)
+                    code.append(codigo)
+                if(tokens[0].token == "jal"):
+                   codigo += tokens[0].opcode + eqPrecisao(format(int(tokens[1].token,2)+4,"b"),26) #op+target
+                   for i in range(0, 2):#retira os 4 primeiros
+                        tokens.pop(0)
+                   code.append(codigo)
         elif(tokens[0].tipo == 'I'):
             if(tokens[0].token == 'addi'):
-                codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + eqPrecisao(tokens[3].funct)#op+rs+rt+imm
+                codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + eqPrecisao(tokens[3].funct,16)#op+rs+rt+imm
                 for i in range(0, 4):#retira os 4 primeiros
                     tokens.pop(0)
                 code.append(codigo)
@@ -398,7 +415,7 @@ def setLabels():
     l = 0
     while l < len(linhas):
         if(linhas[l][-1] == ':'):
-            labels[linhas[l][:-1]] = eqPrecisao(format(l,"b")) 
+            labels[linhas[l][:-1]] = eqPrecisao(format(l,"b"),16) 
             linhas.pop(l)
         l += 1
 #ler os labels
@@ -410,7 +427,8 @@ lerLinhas()
 setOffset()
 
 tradutor()
-print((code[2]))
+print((code))
 #lidar com labels
 #pode parenteses em caso de pilha https://d2vlcm61l7u1fs.cloudfront.net/media%2F138%2F1380baa4-79a2-4bcf-9e82-9e5e57830f26%2FphpePJ8xi.png
 #lidar com erros de sintaxe
+#lidar com endereço puro 
