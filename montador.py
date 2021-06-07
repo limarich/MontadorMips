@@ -18,10 +18,10 @@ else:
     saida = sys.argv[2]
 def isValid():#verifica se o nome do arquivo esta dentro do esperado
     if entrada.find('.asm') == -1:
-        print("formato de entrada não suportado!!!")
+        temp.append("formato de entrada não suportado!!!")
         quit()
     if saida.find('.dat') == -1:
-        print("formato de saida não suportado!!!")
+        temp.append("formato de saida não suportado!!!")
         quit()
 def retiraParenteses(lista):
     temp = []
@@ -62,7 +62,7 @@ def loadFile(fileName):
     arquivo.close() 
 
 loadFile(entrada) #nomeArquivo
-print(linhas)
+# temp.append(linhas)
 # print(f"nome2: {saida}")
 """
 #para rodar use: python montador.py nomeDoArquivo.asm
@@ -180,7 +180,7 @@ def lerCodigo(string):
                 tokens.append(Token(token,'I',"101011",nda)) #sw
                 token = 0
             else:
-                print('erro')
+                temp.append('erro')
         elif(chave == 5):
             if(str == 'b'):
                 chave = 0
@@ -376,7 +376,7 @@ def lerCodigo(string):
         else:
             chave = 0
             erro = f"sintaxe inválida: {token}"
-            print(erro)
+            temp.append(erro)
             token = ''
 """
  uma função que faz a leitura de cada linha e passa para a lerCodigo
@@ -387,7 +387,7 @@ def lerLinhas():
             lerCodigo(linhas[l])
             # print((linhas[l]))
         except:
-            print(f"sintaxe invalida -->{erro}\n")
+            temp.append(f"sintaxe invalida -->{erro}\n")
             quit()
 def eqPrecisao(binario,qtd): #ajeita a precisao deixa a mesma para todos os inteiros fornecidos
     while(len(binario) != qtd):
@@ -449,7 +449,6 @@ def tradutor():
                     tokens.pop(0)
                 code.append(codigo)
                 codigo =""
-
 def setLabels():
     global labels
     l = 0
@@ -458,6 +457,20 @@ def setLabels():
             labels[linhas[l][:-1]] = eqPrecisao(format(l,"b"),16) 
             linhas.pop(l)
         l += 1
+def writeFile():
+    arquivo = open(saida,'w')
+    for string in code:#pega cada codigo da lista
+        temp = []
+        temp.append(string[0:8])
+        temp.append(string[8:16])
+        temp.append(string[16:24])
+        temp.append(string[24:32])
+        # print(temp)
+        for i in range(len(temp)-1,-1,-1):
+            # print(temp[i])
+            arquivo.write(temp[i])
+            arquivo.write("\n")
+    arquivo.close()
 #ler os labels
 setLabels()
 lerLinhas()
@@ -467,6 +480,7 @@ lerLinhas()
 setOffset()
 
 tradutor()
-print((code))
+# temp.append((code))
+writeFile()
 #lidar com erros de sintaxe
 #lidar com endereço puro 
