@@ -18,10 +18,10 @@ else:
     saida = sys.argv[2]
 def isValid():#verifica se o nome do arquivo esta dentro do esperado
     if entrada.find('.asm') == -1:
-        temp.append("formato de entrada não suportado!!!")
+        print("=-"*20+"\nformato de entrada não suportado!!!\n"+"=-"*20)
         quit()
     if saida.find('.dat') == -1:
-        temp.append("formato de saida não suportado!!!")
+        print("=-"*20,"\nformato de saida não suportado!!!\n"+"=-"*20)
         quit()
 def retiraParenteses(lista):
     temp = []
@@ -29,7 +29,6 @@ def retiraParenteses(lista):
     for l in lista:
         temp.append(l.split("("))
     for t2 in temp:
-        # temp2.append(t2.split())
         for t3 in t2:
             temp2.append(t3.split(")"))
     return temp2
@@ -91,8 +90,6 @@ def complemento2(num):
     return soma1(saida)
 
 loadFile(entrada) #nomeArquivo
-# temp.append(linhas)
-# print(f"nome2: {saida}")
 """
 #para rodar use: python montador.py nomeDoArquivo.asm
 """
@@ -161,7 +158,6 @@ def lerCodigo(string):
                     tokens.append(Token(string, nda,nda,complemento2(int(string))))
                 elif(string[:2] == '0x'):
                     tokens.append(Token(string, nda, nda, eqPrecisao((format(int(string,16),"b")),16)))
-                    print(tokens[-1].token)
                 else:
                     tokens.append(Token(string, nda,nda,format(int(string),"b")))#numeros
                 break
@@ -255,9 +251,9 @@ def lerCodigo(string):
                 token += 'r'
                 #or/xor
                 if(string == 'or'):
-                    tokens.append(Token(token,'R',"000000","100101"))
+                    tokens.append(Token(token,'R',"000000","100101"))#or
                 else:
-                    tokens.append(Token(token,'R',"000000","100110"))
+                    tokens.append(Token(token,'R',"000000","100110"))#xor
                 token = ''
             else:
                 chave = 0
@@ -340,6 +336,7 @@ def lerCodigo(string):
                 chave = 0
                 token = ""
                 tokens.append(Token('$zero','registrador',nda,'00000')) #zero
+                break
             elif(str == 'a'):
                 chave = 17
                 token+='a'
@@ -421,7 +418,7 @@ def lerCodigo(string):
                 if(int(str) == 6):
                     tokens.append(Token(token, 'registrador',nda,"01110"))#t6
                 if(int(str) == 7):
-                    tokens.append(Token(token, 'registrador',nda,"01101"))#t7
+                    tokens.append(Token(token, 'registrador',nda,"01111"))#t7
                 if(int(str) == 8):
                     tokens.append(Token(token, 'registrador',nda,"11000"))#t8
                 if(int(str) == 9):
@@ -455,7 +452,7 @@ def lerCodigo(string):
                 elif(int(str) == 6):
                     tokens.append(Token(token, 'registrador',nda,'10110'))#s6
                 elif(int(str) == 7):
-                    tokens.append(Token(token, 'registrador',nda,'10011'))#s7
+                    tokens.append(Token(token, 'registrador',nda,'10111'))#s7
                 token =''
             else:
                 chave = 0
@@ -526,7 +523,6 @@ def tradutor():
             code.append(codigo)
             codigo = ''
         elif(tokens[0].tipo == 'J'):
-            # if(tokens[0].tipo == 'J'):
             if(tokens[0].token == "j"):
                 if(tokens[1].token[0:2] == '0x'):
                     codigo += tokens[0].opcode + eqPrecisao(tokens[1].funct,26) #op+target
@@ -545,14 +541,12 @@ def tradutor():
         elif(tokens[0].tipo == 'I'):
             if(tokens[0].token == 'addi'):
                 codigo += tokens[0].opcode  + tokens[2].funct + tokens[1].funct+ eqPrecisao(tokens[3].funct,16)#op+rs+rt+imm
-                # print(tokens[2].token)
                 for i in range(0, 4):#retira os 4 primeiros
                     tokens.pop(0)
                 code.append(codigo)
                 codigo = ''
             elif(tokens[0].token == 'beq' or tokens[0].token == 'bne'):
                 codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + tokens[3].token #op+rs+rt+offset
-                # print(tokens[2].token)
                 for i in range(0, 4):#retira os 4 primeiros
                     tokens.pop(0)
                 code.append(codigo)
@@ -579,22 +573,15 @@ def writeFile():
         temp.append(string[8:16])
         temp.append(string[16:24])
         temp.append(string[24:32])
-        print(temp)
         for i in range(len(temp)-1,-1,-1):
-            # print(temp[i])
             arquivo.write(temp[i])
             arquivo.write("\n")
     arquivo.close()
 #ler os labels
 setLabels()
 lerLinhas()
-# for tk in tokens:
-#     print(tk.token)
 #lê cada token
 setOffset()
 
 tradutor()
-# temp.append((code))
 writeFile()
-#lidar com erros de sintaxe
-#lidar com endereço puro 
