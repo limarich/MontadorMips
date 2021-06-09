@@ -387,7 +387,7 @@ def lerLinhas():
             lerCodigo(linhas[l])
             # print((linhas[l]))
         except:
-            temp.append(f"sintaxe invalida -->{erro}\n")
+            print(f"sintaxe invalida -->{erro}\n")
             quit()
 def eqPrecisao(binario,qtd): #ajeita a precisao deixa a mesma para todos os inteiros fornecidos
     while(len(binario) != qtd):
@@ -411,7 +411,8 @@ def tradutor():
             code.append(codigo)
             codigo = ''
         elif(tokens[0].tipo == 'R'):
-            codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + tokens[3].funct + shamt + tokens[0].funct #op+rs+rt+rd+shamt+func
+            codigo += tokens[0].opcode + tokens[2].funct + tokens[3].funct + tokens[1].funct + shamt + tokens[0].funct #op+rs+rt+rd+shamt+func
+            # print(f"a token 3:{tokens[1].token}--{tokens[2].funct}")
             for i in range(0, 4):#retira os 4 primeiros
                 tokens.pop(0)
             code.append(codigo)
@@ -432,13 +433,15 @@ def tradutor():
                    codigo = ""
         elif(tokens[0].tipo == 'I'):
             if(tokens[0].token == 'addi'):
-                codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + eqPrecisao(tokens[3].funct,16)#op+rs+rt+imm
+                codigo += tokens[0].opcode  + tokens[2].funct + tokens[1].funct+ eqPrecisao(tokens[3].funct,16)#op+rs+rt+imm
+                # print(tokens[2].token)
                 for i in range(0, 4):#retira os 4 primeiros
                     tokens.pop(0)
                 code.append(codigo)
                 codigo = ''
             elif(tokens[0].token == 'beq' or tokens[0].token == 'bne'):
                 codigo += tokens[0].opcode + tokens[1].funct + tokens[2].funct + tokens[3].token #op+rs+rt+offset
+                # print(tokens[2].token)
                 for i in range(0, 4):#retira os 4 primeiros
                     tokens.pop(0)
                 code.append(codigo)
